@@ -228,32 +228,4 @@ contactForm.addEventListener("input", () => {
   formStatus.classList.remove("is-error");
 });
 
-contactForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  formStatus.classList.remove("is-error");
-
-  if (!contactForm.reportValidity()) return;
-
-  const formData = new FormData(contactForm);
-  formData.set("form-name", contactForm.getAttribute("name"));
-  formStatus.textContent = "Sending your message...";
-
-  try {
-    const response = await fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData).toString()
-    });
-
-    if (!response.ok) throw new Error(`Form submission failed with status ${response.status}.`);
-
-    formStatus.textContent = "Thanks! Your message has been sent successfully.";
-    contactForm.reset();
-  } catch (error) {
-    console.error("Contact form submission failed:", error);
-    formStatus.textContent = "Your message could not be sent. Please try again later or email me directly.";
-    formStatus.classList.add("is-error");
-  }
-});
-
 document.querySelector("#current-year").textContent = String(new Date().getFullYear());
