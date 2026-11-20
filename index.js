@@ -152,6 +152,8 @@ document.querySelectorAll(".sample-open").forEach((button) => {
       paragraph.textContent = text;
       return paragraph;
     }));
+    sampleDialog.querySelector(".dialog-disclosure").textContent =
+      "Original concept sample for portfolio demonstration; not client work.";
     sampleDialog.showModal();
   });
 });
@@ -163,6 +165,88 @@ sampleDialog.querySelector(".dialog-close").addEventListener("click", () => {
 sampleDialog.addEventListener("click", (event) => {
   if (event.target === sampleDialog) sampleDialog.close();
 });
+
+const stories = {
+  story1: {
+    category: "Story by Angel",
+    title: "The Secret Life of Mrs. Unknown",
+    paragraphs: ["Open the PDF below to read the complete story."]
+  }
+};
+
+document.querySelectorAll(".story-open").forEach((button) => {
+  button.addEventListener("click", () => {
+    const story = stories[button.dataset.story];
+    if (!story) return;
+    dialogCategory.textContent = story.category;
+    dialogTitle.textContent = story.title;
+    dialogCopy.replaceChildren(...story.paragraphs.map((text) => {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text;
+      return paragraph;
+    }));
+    const readLink = document.createElement("a");
+    readLink.className = "story-pdf-link";
+    readLink.href = "assets/the-secret-life-of-mrs-unknown.pdf";
+    readLink.target = "_blank";
+    readLink.rel = "noopener";
+    readLink.textContent = "Read or download the full story ↗";
+    dialogCopy.append(readLink);
+    sampleDialog.querySelector(".dialog-disclosure").textContent = "Written by Angel.";
+    sampleDialog.showModal();
+  });
+});
+
+const typedText = document.querySelector("#typed-text");
+const phrases = ["make an impact.", "move people.", "tell a story.", "build trust."];
+let phraseIndex = 0;
+
+function typePhrase() {
+  if (!typedText || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const phrase = phrases[phraseIndex];
+  let characterIndex = 0;
+  let deleting = false;
+
+  const update = () => {
+    typedText.textContent = phrase.slice(0, characterIndex);
+    if (!deleting && characterIndex < phrase.length) {
+      characterIndex += 1;
+      window.setTimeout(update, 72);
+    } else if (!deleting) {
+      deleting = true;
+      window.setTimeout(update, 1450);
+    } else if (characterIndex > 0) {
+      characterIndex -= 1;
+      window.setTimeout(update, 38);
+    } else {
+      phraseIndex = (phraseIndex + 1) % phrases.length;
+      window.setTimeout(typePhrase, 260);
+    }
+  };
+
+  update();
+}
+
+typePhrase();
+
+const revealTargets = document.querySelectorAll(
+  ".hero-copy, .hero-visual, .section-heading, .about-copy, .strengths, .service-card, .work-card, .process-grid li, .why-list li, .stories-heading, .story-card"
+);
+
+revealTargets.forEach((target) => target.classList.add("reveal"));
+
+if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12 });
+  revealTargets.forEach((target) => revealObserver.observe(target));
+} else {
+  revealTargets.forEach((target) => target.classList.add("is-visible"));
+}
 
 function configuredValue(value) {
   return value.trim() !== "" && !value.includes("YOUR_") && !value.includes("example.com");
